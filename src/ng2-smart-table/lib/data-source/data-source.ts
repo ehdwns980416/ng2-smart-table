@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { Http, Headers, RequestOptions, Response, URLSearchParams } from '@angular/http';
 
 export abstract class DataSource {
 
@@ -14,12 +15,13 @@ export abstract class DataSource {
   abstract getFilter(): any;
   abstract getPaging(): any;
   abstract count(): number;
+  abstract countdata(): number;
 
   refresh() {
     this.emitOnChanged('refresh');
   }
 
-  load(data: Array<any>): Promise<any> {
+  load(data: Array<any>, count: number, page: number, perPage: number): Promise<any> {
     this.emitOnChanged('load');
     return Promise.resolve();
   }

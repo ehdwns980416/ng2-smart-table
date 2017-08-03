@@ -7,35 +7,38 @@ import { DataSource } from '../../lib/data-source/data-source';
   selector: 'ng2-smart-table-pager',
   styleUrls: ['./pager.component.scss'],
   template: `
-    <nav *ngIf="shouldShow()" class="ng2-smart-pagination-nav">
-      <ul class="ng2-smart-pagination pagination">
-        <li class="ng2-smart-page-item page-item" [ngClass]="{disabled: getPage() == 1}">
-          <a class="ng2-smart-page-link page-link" href="#"
-          (click)="getPage() == 1 ? false : paginate(1)" aria-label="First">
-            <span aria-hidden="true">&laquo;</span>
-            <span class="sr-only">First</span>
-          </a>
-        </li>
-        <li class="ng2-smart-page-item page-item"
-        [ngClass]="{active: getPage() == page}" *ngFor="let page of getPages()">
-          <span class="ng2-smart-page-link page-link"
-          *ngIf="getPage() == page">{{ page }} <span class="sr-only">(current)</span></span>
-          <a class="ng2-smart-page-link page-link" href="#"
-          (click)="paginate(page)" *ngIf="getPage() != page">{{ page }}</a>
-        </li>
-
-        <li class="ng2-smart-page-item page-item"
-        [ngClass]="{disabled: getPage() == getLast()}">
-          <a class="ng2-smart-page-link page-link" href="#"
-          (click)="getPage() == getLast() ? false : paginate(getLast())" aria-label="Last">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Last</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
+    <nav *ngIf="shouldShow()" class="ng2-smart-pagination-nav"></nav>
   `,
 })
+
+// template bak
+// <nav *ngIf="shouldShow()" class="ng2-smart-pagination-nav">
+//   <ul class="ng2-smart-pagination pagination">
+//     <li class="ng2-smart-page-item page-item" [ngClass]="{disabled: getPage() == 1}">
+//       <a class="ng2-smart-page-link page-link" href="#"
+//       (click)="getPage() == 1 ? false : paginate(1)" aria-label="First">
+//         <span aria-hidden="true">&laquo;</span>
+//         <span class="sr-only">First</span>
+//       </a>
+//     </li>
+//     <li class="ng2-smart-page-item page-item"
+//     [ngClass]="{active: getPage() == page}" *ngFor="let page of getPages()">
+//       <span class="ng2-smart-page-link page-link"
+//       *ngIf="getPage() == page">{{ page }} <span class="sr-only">(current)</span></span>
+//       <a class="ng2-smart-page-link page-link" href="#"
+//       (click)="paginate(page)" *ngIf="getPage() != page">{{ page }}</a>
+//     </li>
+//     <li class="ng2-smart-page-item page-item"
+//     [ngClass]="{disabled: getPage() == getLast()}">
+//       <a class="ng2-smart-page-link page-link" href="#"
+//       (click)="getPage() == getLast() ? false : paginate(getLast())" aria-label="Last">
+//         <span aria-hidden="true">&raquo;</span>
+//         <span class="sr-only">Last</span>
+//       </a>
+//     </li>
+//   </ul>
+// </nav>
+
 export class PagerComponent implements OnChanges {
 
   @Input() source: DataSource;
@@ -43,7 +46,7 @@ export class PagerComponent implements OnChanges {
   @Output() changePage = new EventEmitter<any>();
 
   protected pages: Array<any>;
-  protected page: number;
+  public page: number = 1;
   protected count: number = 0;
   protected perPage: number;
 
@@ -56,14 +59,16 @@ export class PagerComponent implements OnChanges {
       }
       this.dataChangedSub = this.source.onChanged().subscribe((dataChanges) => {
         this.page = this.source.getPaging().page;
+        // this.page = this.page;
         this.perPage = this.source.getPaging().perPage;
-        this.count = this.source.count();
-        if (this.isPageOutOfBounce()) {
-          this.source.setPage(--this.page);
-        }
+        // this.count = this.source.count();
+        this.count = this.source.countdata();
+        // if (this.isPageOutOfBounce()) {
+        //   this.source.setPage(--this.page);
+        // }
 
-        this.processPageChange(dataChanges);
-        this.initPages();
+        // this.processPageChange(dataChanges);
+        this.initPages2(this.getPage());
       });
     }
   }
@@ -84,7 +89,8 @@ export class PagerComponent implements OnChanges {
   }
 
   shouldShow(): boolean {
-    return this.source.count() > this.perPage;
+    // return this.source.count() > this.perPage;
+    return true;
   }
 
   paginate(page: number): boolean {
@@ -92,6 +98,11 @@ export class PagerComponent implements OnChanges {
     this.page = page;
     this.changePage.emit({ page });
     return false;
+  }
+
+  paginate2(page: number) {
+    this.page = page;
+    this.changePage.emit({ page });
   }
 
   getPage(): number {
@@ -106,25 +117,53 @@ export class PagerComponent implements OnChanges {
     return Math.ceil(this.count / this.perPage);
   }
 
+  setCount(countdata: number) {
+    this.count = countdata;
+  }
+
   isPageOutOfBounce(): boolean {
     return (this.page * this.perPage) >= (this.count + this.perPage) && this.page > 1;
   }
 
-  initPages() {
+  // initPages() {
+  //   const pagesCount = this.getLast();
+  //   let showPagesCount = 5;
+  //   showPagesCount = pagesCount < showPagesCount ? pagesCount : showPagesCount;
+  //   this.pages = [];
+  //
+  //   if (this.shouldShow()) {
+  //
+  //     let middleOne = Math.ceil(showPagesCount / 2);
+  //     middleOne = this.page >= middleOne ? this.page : middleOne;
+  //
+  //     let lastOne = middleOne + Math.floor(showPagesCount / 2);
+  //     lastOne = lastOne >= pagesCount ? pagesCount : lastOne;
+  //
+  //     const firstOne = lastOne - showPagesCount + 1;
+  //
+  //     for (let i = firstOne; i <= lastOne; i++) {
+  //       this.pages.push(i);
+  //     }
+  //   }
+  // }
+
+  initPages2(page) {
     const pagesCount = this.getLast();
-    let showPagesCount = 4;
+    let showPagesCount = 5;
     showPagesCount = pagesCount < showPagesCount ? pagesCount : showPagesCount;
     this.pages = [];
 
     if (this.shouldShow()) {
 
       let middleOne = Math.ceil(showPagesCount / 2);
-      middleOne = this.page >= middleOne ? this.page : middleOne;
+      middleOne = page >= middleOne ? page : middleOne;
 
-      let lastOne = middleOne + Math.floor(showPagesCount / 2);
+      let lastOne = +middleOne + Math.floor(showPagesCount / 2);
       lastOne = lastOne >= pagesCount ? pagesCount : lastOne;
 
-      const firstOne = lastOne - showPagesCount + 1;
+      const firstOne = +lastOne - showPagesCount + 1;
+
+      // console.log(firstOne+' '+middleOne+' '+lastOne);
 
       for (let i = firstOne; i <= lastOne; i++) {
         this.pages.push(i);

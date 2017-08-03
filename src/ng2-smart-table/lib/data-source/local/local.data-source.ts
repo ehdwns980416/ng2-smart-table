@@ -14,6 +14,7 @@ export class LocalDataSource extends DataSource {
     andOperator: true,
   };
   protected pagingConf: any = {};
+  protected countnum: number;
 
   constructor(data: Array<any> = []) {
     super();
@@ -21,10 +22,11 @@ export class LocalDataSource extends DataSource {
     this.data = data;
   }
 
-  load(data: Array<any>): Promise<any> {
+  load(data: Array<any>, count: number, page: number, perPage: number): Promise<any> {
     this.data = data;
-
-    return super.load(data);
+    this.countnum = count;
+    // this.setPaging(page, perPage);
+    return super.load(data, count, page, perPage);
   }
 
   prepend(element: any): Promise<any> {
@@ -112,6 +114,10 @@ export class LocalDataSource extends DataSource {
     return this.filteredAndSorted.length;
   }
 
+  countdata(): number {
+    return this.countnum;
+  }
+
   /**
    *
    * Array of conf objects
@@ -191,6 +197,7 @@ export class LocalDataSource extends DataSource {
     this.pagingConf['perPage'] = perPage;
 
     super.setPaging(page, perPage, doEmit);
+
     return this;
   }
 
